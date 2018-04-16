@@ -26,6 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir.'/authlib.php');
+require_once($CFG->dirroot.'/auth/digicode/lib.php');
 
 /**
  * Manual authentication plugin.
@@ -54,6 +55,57 @@ class auth_plugin_digicode extends auth_plugin_base {
     }
 
     /**
+     * Authentication choice (CAS or other)
+     * Redirection to the digicode form or to login/index.php
+     * for other authentication
+     */
+    function loginpage_hook() {
+        global $frm;
+        global $CFG;
+        global $SESSION, $OUTPUT, $PAGE;
+
+        if (isloggedin()) {
+            if (!empty($SESSION->wantsurl)) {
+                redirect($SESSION->wantsurl);
+            }
+            redirect($CFG->wwwroot);
+        }
+
+        // Return if digicode auth is not enabled.
+        if (empty($this->config->enabled)) {
+            return;
+        }
+
+        // Return if no session running or in prerun.
+        if (!$activesession = $this->has_valid_session()) {
+            return;
+        }
+
+        $site = get_site();
+
+        $digicodethrough = optional_param('authDC', 'DC', PARAM_TEXT);
+        if ($digicodethrough != 'DC') {
+            return;
+        }
+
+        $username = optional_param('username', false, PARAM_TEXT);
+        $password = optional_param('password', false, PARAM_TEXT);
+        $password = preg_replace('/[^0-9]/', '', $password); // Trim out all non strictly digits.
+
+        if (!empty($username)) {
+            if ($this->user_login($username, $password)) {
+                // Give back to the real authentifcation process. come back to user_login.
+                redirect($CFG->wwwroot);
+            }
+        }
+
+        // If digicode is enabled, we divert to a special form with digicode input.
+        $digicodeformurl = new moodle_url('/auth/digicode/login.php', array('sessionid' => $activesession->id, 'sesskey' => sesskey()));
+        redirect($digicodeformurl);
+    }
+
+
+    /**
      * Old syntax of class constructor. Deprecated in PHP7.
      *
      * @deprecated since Moodle 3.1
@@ -72,13 +124,16 @@ class auth_plugin_digicode extends auth_plugin_base {
      * @return bool Authentication success or failure.
      */
     function user_login($username, $password) {
-        global $CFG, $DB, $USER;
-        if (!$user = $DB->get_record('user', array('username'=>$username, 'mnethostid'=>$CFG->mnet_localhost_id))) {
+        global $CFG, $DB, $user, $USER;
+
+        if (!$user = $DB->get_record('user', array('username' => $username, 'mnethostid' => $CFG->mnet_localhost_id))) {
             return false;
         }
         if (!$this->check_digicode($user, $password)) {
             return false;
         }
+
+        $USER = $user;
         return true;
     }
 
@@ -99,7 +154,7 @@ class auth_plugin_digicode extends auth_plugin_base {
             $DB->set_field('user_preferences', 'value', $newdigicode, $params);
     }
 
-    function prevent_local_passwords() {
+    public function prevent_local_passwords() {
         return false;
     }
 
@@ -108,7 +163,7 @@ class auth_plugin_digicode extends auth_plugin_base {
      *
      * @return bool
      */
-    function is_internal() {
+    public function is_internal() {
         return true;
     }
 
@@ -118,7 +173,7 @@ class auth_plugin_digicode extends auth_plugin_base {
      *
      * @return bool
      */
-    function can_change_password() {
+    public function can_change_password() {
         return true;
     }
 
@@ -128,7 +183,7 @@ class auth_plugin_digicode extends auth_plugin_base {
      *
      * @return moodle_url
      */
-    function change_password_url() {
+    public function change_password_url() {
         return null;
     }
 
@@ -137,8 +192,8 @@ class auth_plugin_digicode extends auth_plugin_base {
      *
      * @return bool
      */
-    function can_reset_password() {
-        return true;
+    public function can_reset_password() {
+        return false;
     }
 
     /**
@@ -146,44 +201,173 @@ class auth_plugin_digicode extends auth_plugin_base {
      *
      * @return bool
      */
-    function can_be_manually_set() {
+    public function can_be_manually_set() {
         return true;
     }
 
-    /**
-     * Return number of days to user password expires.
-     *
-     * If user password does not expire, it should return 0 or a positive value.
-     * If user password is already expired, it should return negative value.
-     *
-     * @param mixed $username username (with system magic quotes)
-     * @return integer
-     */
-    public function password_expire($username) {
-        $result = 0;
+    // Very simple check, as short as possible.
+    public function check_digicode(&$user, $digicode) {
+        global $DB, $CFG;
 
-        if (!empty($this->config->expirationtime)) {
-            $user = core_user::get_user_by_username($username, 'id,timecreated');
-            $lastpasswordupdatetime = get_user_preferences('auth_manual_passwordupdatetime', $user->timecreated, $user->id);
-            $expiretime = $lastpasswordupdatetime + $this->config->expirationtime * DAYSECS;
-            $now = time();
-            $result = ($expiretime - $now) / DAYSECS;
-            if ($expiretime > $now) {
-                $result = ceil($result);
-            } else {
-                $result = floor($result);
+        if (auth_digicode_supports_feature('digicode/shadowed')) {
+            include_once($CFG->dirroot.'/auth/digicode/pro/lib.php');
+            auth_digicode_check($dg, $user);
+        } else {
+            $params = array('userid' => $user->id, 'name' => 'digicode', 'value' => $digicode);
+            return $DB->record_exists('user_preferences', $params);
+        }
+    }
+
+    public function has_valid_session() {
+        global $DB;
+
+        $time = time();
+
+        $select = '
+            sessiontime - (preopentime * 60) <= ? AND
+            ? <= sessiontime + duration * 60
+        ';
+
+        $activesession = $DB->get_record_select('auth_digicode', $select, array($time, $time));
+
+        if ($activesession) {
+            $activesession->is_running = $time >= $activesession->sessiontime;
+        }
+
+        return $activesession;
+    }
+
+    /**
+     * TODO : refine conditions.
+     */
+    public static function session_has_valid_restriction($session) {
+
+        if (!empty($session->restrictiontype) && !empty($session->restrictionvalue)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get the target users
+     */
+    public static function get_target_users($taskconfig, $limit = 0, $offset = 0) {
+        global $DB;
+
+        $targetusers = array();
+
+        if (!empty($taskconfig->restrictiontype)) {
+            switch ($taskconfig->restrictiontype) {
+
+                case 'role': {
+                    if ($taskconfig->restrictioncontextlevel == 'system') {
+                        $context = context_system::instance();
+                    } else if ($taskconfig->restrictioncontextlevel == 'site') {
+                        $context = context_course::instance(SITEID);
+                    } else if ($taskconfig->restrictioncontextlevel == 'course') {
+                        $context = context_course::instance($taskconfig->courseid);
+                    } else {
+                        return;
+                    }
+
+                    $role = $DB->get_record('role', array('shortname' => $taskconfig->restrictionvalue));
+                    if ($ras = get_users_from_role_on_context($role, $context)) {
+                        foreach ($ras as $ra) {
+                            // singlify result.
+                            $userids[$ra->userid] = $ra->userid;
+                        }
+
+                        // Unify results with other methods.
+                        $fields = 'id, '.get_all_user_name_fields(true, '');
+                        foreach (array_keys($userids) as $uid) {
+                            $targetusers[$uid] = $DB->get_record('user', array('id' => $uid), $fields);
+                        }
+                    }
+
+                    break;
+                }
+
+                case 'capability': {
+
+                    if ($taskconfig->restrictioncontextlevel == 'system') {
+                        $context = context_system::instance();
+                    } else if ($taskconfig->restrictioncontextlevel == 'site') {
+                        $context = context_course::instance(SITEID);
+                    } else if ($taskconfig->restrictioncontextlevel == 'course') {
+                        $context = context_course::instance($customdata->courseid);
+                    }
+
+                    $fields = 'u.id, '.get_all_user_name_fields(true, 'u');
+                    $targetusers = get_users_by_capability($context, $taskconfig->restrictionvalue, $fields);
+
+                    break;
+                }
+
+                case 'profilefield': {
+                    if (strpos($taskconfig->restrictionid, 'user:') === 0) {
+                        // By standard profile field.
+                        $fieldname = str_replace('user:', '', $taskconfig->restrictionid);
+                        $select = $fieldname.' LIKE ?';
+                        $fields = 'id, '.get_all_user_name_fields(true, '');
+                        $targetusers = $DB->get_records_select('user', $select, array($taskconfig->restrictionvalue), $fields);
+                    } else if (strpos($taskconfig->restrictionid, 'profile_field:') === 0) {
+                        // By custom profile field.
+                        $fieldname = str_replace('profile_field:', '', $taskconfig->restrictionid);
+                        $field = $DB->get_record('user_info_field', array('shortname' => $fieldname));
+                        $fields = 'u.id, '.get_all_user_name_fields(true, 'u');
+                        $sql = "
+                            SELECT
+                                {$fields}
+                            FROM
+                                {user_info_data} uid,
+                                {user} u
+                            WHERE
+                                uid.userid = u.id AND
+                                uid.fieldid = ?
+                                data LIKE ?
+                        ";
+                        $params = array($field->id, $taskconfig->restrictionvalue);
+                        $targetusers = $DB->get_records_sql($sql, $params);
+                    }
+                    break;
+                }
+
+                default:
+                    // Might be huge !
+                    return $DB->get_records('user', array(), 'id', $fields, $limit, $offset);
             }
         }
 
-        return $result;
+        return $targetusers;
     }
 
-    // Very simple check, as short as possible.
-    function check_digicode($userid, $digicode) {
+    public static function delete_user_info($userorid) {
         global $DB;
 
-        $params = array('userid' => $user->id, 'name' => 'digicode', 'value' => $digicode);
-        return $DB->record_exists('user_preferences', $params);
+        if (is_numeric($userorid)) {
+            $userid = $userorid;
+        } else {
+            $userid = $userorid->id;
+        }
+
+        $params = array('userid' => $userid, 'name' => 'digicode');
+        $DB->delete_records('user_preferences', $params);
+    }
+
+    public static function get_user_info($userorid) {
+        global $DB;
+
+        if (is_numeric($userorid)) {
+            $userid = $userorid;
+        } else {
+            $userid = $userorid->id;
+        }
+
+        $params = array('userid' => $userid, 'name' => 'digicode');
+        if ($digicode = $DB->get_record('user_preferences', $params)) {
+            return array('digicode' => $digicode->value);
+        }
+        return null;
     }
 }
 

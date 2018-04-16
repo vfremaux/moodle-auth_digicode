@@ -1,0 +1,145 @@
+
+
+.digicode-row {
+    vertical-align: middle;
+}
+
+.digicode-digit {
+    font-size: 1.3em;
+    padding: 10px;
+    background-color: #a00000;
+    border:1px solid white;
+    color: white;
+    font-weight: bold;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    text-align: center;
+}
+
+.digicode-digit.highlighted {
+    background-color: #fff;
+    color: #a00000;
+}
+
+.digicode-digit.active {
+    background-color: #000;
+    color: white;
+}
+
+#dc-login-form {
+    margin: auto;
+    width: 400Px;
+    padding:30px;
+    border: 1px solid #808080;
+    border-radius: 8px;
+}
+
+#digicode-login {
+    display: table;
+    vertical-align: baseline;
+}
+
+#dc-login-form .form-label,
+#dc-login-form .form-item {
+    display: table-cell;
+}
+
+#dc-login-form .form-label {
+    width: 50%;
+}
+
+#digicode-widget {
+    text-align:center;
+    margin-top:20px;
+}
+
+#digicode-shadow {
+    border: 5px solid #888;
+    padding: 4px;
+    margin: 10px auto;
+    width: 8em;
+    height: 1.8em;
+    font-size: 1.8em;
+    color: #444;
+    display: inline-block;
+    background-color: #eee;
+}
+
+#digicode-panel {
+    border: 1px solid #808080;
+    border-radius: 8px;
+    padding:10px;
+    margin:10px;
+}
+
+.digicode-table {
+    margin:auto;
+}
+
+#digicode-submit {
+    text-align: center;
+}
+
+#session-name {
+    width: 48%;
+    margin: auto;
+    padding-bottom: 10px;
+}
+
+#prerun-panel{
+    margin: auto;
+    width: 48%;
+    padding:30px;
+    border: 1px solid #808080;
+    border-radius: 8px;
+}
+
+#dc-instructions-form {
+    margin: auto;
+    width: 48%;
+    padding:30px;
+    border: 1px solid #808080;
+    border-radius: 8px;
+}
+
+#chrono-timer{
+    float:left;
+    max-width: 200px;
+}
+
+#chrono-display {
+    padding: 10px;
+    font-size: 1.6em;
+    font-weight: larger;
+    font-family: monospace;
+}
+
+.chrono-countup  {
+    border:3px solid green;
+    border-radius:8px;
+    color:green;
+}
+
+.chrono-countdown {
+    border:3px solid red;
+    border-radius:8px;
+    color:red;
+}
+
+tr.running > td {
+    background-color: #FF7471;
+}
+
+tr.future > td {
+    background-color: #7284FE;
+}
+
+tr.opening > td {
+    background-color: #FFC271;
+}
+
+tr.passed > td {
+    background-color: #6DFC80;
+}

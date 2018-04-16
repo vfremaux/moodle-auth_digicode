@@ -23,56 +23,107 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
+require_once($CFG->dirroot.'/auth/digicode/lib.php');
+
+$label = get_string('managesessions', 'auth_digicode');
+$pageurl = new moodle_url('/auth/digicode/digicode_sessions.php');
+$settingspage = new admin_externalpage('digicode', $label , $pageurl, 'auth/digicode:managesessions');
+$ADMIN->add('users', $settingspage);
 
 if ($ADMIN->fulltree) {
 
     // Introductory explanation.
-    $settings->add(new admin_setting_heading('auth_manual/pluginname',
-            new lang_string('passwdexpire_settings', 'auth_manual'),
-            new lang_string('auth_manualdescription', 'auth_manual')));
+    $key = 'auth_digicode/pluginname';
+    $header = get_string('digicode_settings', 'auth_digicode');
+    $desc = get_string('auth_digicodedescription', 'auth_digicode');
+    $settings->add(new admin_setting_heading($key, $header, $desc));
 
-    $expirationoptions = array(
-        new lang_string('no'),
-        new lang_string('yes'),
+    $lengthoptions = array(
+        4 => 4,
+        5 => 5,
+        6 => 6,
     );
 
-    $settings->add(new admin_setting_configselect('auth_manual/expiration',
-        new lang_string('expiration', 'auth_manual'),
-        new lang_string('expiration_desc', 'auth_manual'), 0, $expirationoptions));
+    $key = 'auth_digicode/length';
+    $label = get_string('configlength', 'auth_digicode');
+    $desc = get_string('configlength_desc', 'auth_digicode');
+    $settings->add(new admin_setting_configselect($key, $label, $desc, 4, $lengthoptions));
 
-    $expirationtimeoptions = array(
-        '30' => new lang_string('numdays', '', 30),
-        '60' => new lang_string('numdays', '', 60),
-        '90' => new lang_string('numdays', '', 90),
-        '120' => new lang_string('numdays', '', 120),
-        '150' => new lang_string('numdays', '', 150),
-        '180' => new lang_string('numdays', '', 180),
-        '365' => new lang_string('numdays', '', 365),
+    $durationoptions = array(
+        '0' => new lang_string('neverexpires', 'auth_digicode'),
+        '30' => new lang_string('minutes', 'auth_digicode', 30),
+        '45' => new lang_string('minutes', 'auth_digicode', 45),
+        '60' => new lang_string('minutes', 'auth_digicode', 60),
+        '75' => new lang_string('minutes', 'auth_digicode', 75),
+        '90' => new lang_string('minutes', 'auth_digicode', 90),
+        '105' => new lang_string('minutes', 'auth_digicode', 105),
+        '120' => new lang_string('minutes', 'auth_digicode', 120),
+        '135' => new lang_string('minutes', 'auth_digicode', 135),
+        '150' => new lang_string('minutes', 'auth_digicode', 150),
+        '180' => new lang_string('minutes', 'auth_digicode', 180),
+        '210' => new lang_string('minutes', 'auth_digicode', 210),
+        '240' => new lang_string('minutes', 'auth_digicode', 240),
     );
 
-    $settings->add(new admin_setting_configselect('auth_manual/expirationtime',
-        new lang_string('passwdexpiretime', 'auth_manual'),
-        new lang_string('passwdexpiretime_desc', 'auth_manual'), 30, $expirationtimeoptions));
+    $key = 'auth_digicode/defaultduration';
+    $label = get_string('configexpiration', 'auth_digicode');
+    $desc = get_string('configexpiration_desc', 'auth_digicode');
+    $default = '60';
+    $settings->add(new admin_setting_configselect($key, $label, $desc, $default, $durationoptions));
 
-    $expirationwarningoptions = array(
-        '0' => new lang_string('never'),
-        '1' => new lang_string('numdays', '', 1),
-        '2' => new lang_string('numdays', '', 2),
-        '3' => new lang_string('numdays', '', 3),
-        '4' => new lang_string('numdays', '', 4),
-        '5' => new lang_string('numdays', '', 5),
-        '6' => new lang_string('numdays', '', 6),
-        '7' => new lang_string('numdays', '', 7),
-        '10' => new lang_string('numdays', '', 10),
-        '14' => new lang_string('numdays', '', 14),
+    $key = 'auth_digicode/generatecodespredelay';
+    $label = get_string('configgeneratepredelay', 'auth_digicode');
+    $desc = get_string('configgeneratepredelay_desc', 'auth_digicode');
+    $default = '72';
+    $settings->add(new admin_setting_configtext($key, $label, $desc, $default));
+
+    $key = 'auth_digicode/instructions';
+    $label = get_string('configinstructions', 'auth_digicode');
+    $desc = get_string('configinstructions_desc', 'auth_digicode');
+    $settings->add(new admin_setting_configtextarea($key, $label, $desc, ''));
+
+    $rtoptions = array(
+        'none' => new lang_string('restrictiontype:none', 'auth_digicode'),
+        'profilefield' => new lang_string('restrictiontype:profilefield', 'auth_digicode'),
+        'role' => new lang_string('restrictiontype:role', 'auth_digicode'),
+        'capability' => new lang_string('restrictiontype:capability', 'auth_digicode')
     );
 
-    $settings->add(new admin_setting_configselect('auth_manual/expiration_warning',
-        new lang_string('expiration_warning', 'auth_manual'),
-        new lang_string('expiration_warning_desc', 'auth_manual'), 0, $expirationwarningoptions));
+    $key = 'auth_digicode/restrictiontype';
+    $label = get_string('configrestrictiontype', 'auth_digicode');
+    $desc = get_string('configrestrictiontype_desc', 'auth_digicode');
+    $settings->add(new admin_setting_configselect($key, $label, $desc, 'role', $rtoptions));
 
-    // Display locking / mapping of profile fields.
-    $authplugin = get_auth_plugin('manual');
-    display_auth_lock_options($settings, $authplugin->authtype,
-        $authplugin->userfields, get_string('auth_fieldlocks_help', 'auth'), false, false);
+    $rcoptions = array(
+        'none' => new lang_string('restrictiontype:none', 'auth_digicode'),
+        'system' => new lang_string('restrictioncontext:system', 'auth_digicode'),
+        'site' => new lang_string('restrictioncontext:site', 'auth_digicode'),
+        'course' => new lang_string('restrictioncontext:course', 'auth_digicode'),
+        'user' => new lang_string('restrictioncontext:user', 'auth_digicode')
+    );
+
+    $key = 'auth_digicode/restrictioncontext';
+    $label = get_string('configrestrictioncontext', 'auth_digicode');
+    $desc = get_string('configrestrictioncontext_desc', 'auth_digicode');
+    $settings->add(new admin_setting_configselect($key, $label, $desc, 'course', $rcoptions));
+
+    $key = 'auth_digicode/restrictionid';
+    $label = get_string('configrestrictionid', 'auth_digicode');
+    $desc = get_string('configrestrictionid_desc', 'auth_digicode');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, ''));
+
+    $key = 'auth_digicode/restrictionvalue';
+    $label = get_string('configrestrictionvalue', 'auth_digicode');
+    $desc = get_string('configrestrictionvalue_desc', 'auth_digicode');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'student'));
+
+    if (auth_digicode_supports_feature('emulate/community')) {
+        // This will accept any.
+        include_once($CFG->dirroot.'/auth/digicode/pro/prolib.php');
+        \auth_digicode\pro_manager::add_settings($ADMIN, $settings);
+    } else {
+        $label = get_string('plugindist', 'auth_digicode');
+        $desc = get_string('plugindist_desc', 'auth_digicode');
+        $settings->add(new admin_setting_heading('plugindisthdr', $label, $desc));
+    }
 }
