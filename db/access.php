@@ -15,21 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Manual authentication plugin version information
+ * @category CategoryName
+ * @package  
+ * @author   Valery Fremaux ()
+ * @license  http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * @link     https://github.com/cannod/moodle-drupalservices
  *
- * @package    auth_digicode
- * @author     Valery Fremaux <valery.remaux@gmail.com>
- * @copyright  2018 onwards Valery Fremaux (http://www.mylearningfactory.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018031101;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2017110800;        // Requires this Moodle version.
-$plugin->component = 'auth_digicode';     // Full name of the plugin (used for diagnostics).
-$plugin->maturity = MATURITY_BETA;
-$plugin->release = "3.4.0 (Build 2018031101)";
+$capabilities = array(
+    'auth/digicode:managesessions' => array(
 
-// Non moodle attributes
-$plugin->codeincrement = "3.4.0001";
+        'riskbitmask' => RISK_CONFIG,
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+        )
+    ),
+);

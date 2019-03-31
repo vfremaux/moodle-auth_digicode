@@ -1,0 +1,100 @@
+
+
+
+<!-- login -->
+
+<h2 id="session-name">{{{name}}}</h2>
+
+<div id="chrono-timer">
+    {{willopenstr}}:<br/>
+    <div id="digicode-chrono" class="opening">
+    {{{chrono}}}
+    </div>
+</div>
+
+
+{{#isrunning}}
+<form name="login_dc" method="POST" action="{{loginurl}}">
+<input type="hidden" name="authDC" value="DC" />
+<div class="row row-fluid">
+    <div id="dc-login-form" class="span6 xm-col-6">
+        <div id="digicode-login">
+            <div class="form-label">
+                {{username}}:
+            </div>
+            <div class="form-item">
+                <input type="text" name="username" />
+            </div>
+        </div>
+        <div id="digicode-widget">
+            <div id="digicode-shadow"></div>
+            <input type="hidden" name="password" id="digicode-input" />
+        </div>
+        <div id="digicode-panel">
+            <table class="digicode-table">
+                <tr class="digicode-row">
+                    <td id="dc-{{digit0}}" class="digicode-digit">
+                        {{digit0}}
+                    </td>
+                    <td id="dc-{{digit1}}" class="digicode-digit">
+                        {{digit1}}
+                    </td>
+                    <td id="dc-{{digit2}}" class="digicode-digit">
+                        {{digit2}}
+                    </td>
+                    <td id="dc-{{digit3}}" class="digicode-digit">
+                        {{digit3}}
+                    </td>
+                    <td id="dc-{{digit4}}" class="digicode-digit">
+                        {{digit4}}
+                    </td>
+                </tr>
+                <tr class="digicode-row">
+                    <td id="dc-{{digit5}}" class="digicode-digit">
+                        {{digit5}}
+                    </td>
+                    <td id="dc-{{digit6}}" class="digicode-digit">
+                        {{digit6}}
+                    </td>
+                    <td id="dc-{{digit7}}" class="digicode-digit">
+                        {{digit7}}
+                    </td>
+                    <td id="dc-{{digit8}}" class="digicode-digit">
+                        {{digit8}}
+                    </td>
+                    <td id="dc-{{digit9}}" class="digicode-digit">
+                        {{digit9}}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="digicode-submit">
+            <input type="submit" value="{{loginstr}}" class="btn">
+            {{#debug}}
+                <input type="checkbox" name="PROFILEME" value="1" /> {{profilestr}}
+            {{/debug}}
+        </div>
+    </div>
+
+    {{#instructions}}
+    <div id="dc-instructions-form" class="span6 xm-col-6">
+    {{{instructions}}}
+    </div>
+    {{/instructions}}
+
+</div>
+{{/isrunning}}
+{{^isrunning}}
+<div id="prerun-panel">
+    <div id="instructions">
+        {{{instructions}}}
+    </div>
+</div>
+{{/isrunning}}
+
+<div>
+    <center>
+    <a href="/login/index.php?authDC=NODC">{{otherusersstr}}</a>
+    </center>
+</div>
+<!-- /login -->
