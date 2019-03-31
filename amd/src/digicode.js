@@ -50,7 +50,7 @@ define(['jquery', 'core/log'], function($, log) {
         },
 
         add_digit: function() {
-            that = $(this);
+            var that = $(this);
 
             var value = $('#digicode-input').val();
             var shadow = $('#digicode-shadow').html();
@@ -62,7 +62,7 @@ define(['jquery', 'core/log'], function($, log) {
         },
 
         highlight_digit: function() {
-            that = $(this);
+            var that = $(this);
 
             digicode.lightoff_digits();
             that.addClass('highlighted');
@@ -81,10 +81,11 @@ define(['jquery', 'core/log'], function($, log) {
             log.debug(chronotime + " " + chronodir);
             chronotime += chronodir;
 
-            h = Math.floor(chronotime / 3600);
-            rawm = chronotime - (h * 3600);
-            m = Math.floor(rawm / 60);
-            s = rawm - (m * 60);
+            var h = Math.floor(chronotime / 3600);
+            var rawm = chronotime - (h * 3600);
+            var m = Math.floor(rawm / 60);
+            var s = rawm - (m * 60);
+            var ht, mt, st;
 
             log.debug(h + ' ' + rawm + ' ' + m + ' ' + s);
 
