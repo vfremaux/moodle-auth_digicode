@@ -27,11 +27,13 @@ defined('MOODLE_INTERNAL') || die();
  * This function is not implemented in this plugin, but is needed to mark
  * the vf documentation custom volume availability.
  */
-function auth_digicode_supports_feature($feature) {
+function auth_digicode_supports_feature($feature=null, $getsupported = false) {
     global $CFG;
     static $supports;
 
-    $config = get_config('auth_digicode');
+    if (!during_initial_install()) {
+        $config = get_config('auth_digicode');
+	}
 
     if (!isset($supports)) {
         $supports = array(
@@ -41,6 +43,10 @@ function auth_digicode_supports_feature($feature) {
             'community' => array(),
         );
         $prefer = array();
+    }
+
+    if ($getsupported) {
+        return $supports;
     }
 
     // Check existance of the 'pro' dir in plugin.
@@ -55,6 +61,11 @@ function auth_digicode_supports_feature($feature) {
         }
     } else {
         $versionkey = 'community';
+    }
+
+    if (empty($feature)) {
+        // Just return version.
+        return $versionkey;
     }
 
     list($feat, $subfeat) = explode('/', $feature);

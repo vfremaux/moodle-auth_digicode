@@ -46,16 +46,10 @@ $string['course'] = 'Cours cible';
 $string['digicode'] = 'Composez votre code';
 $string['digicode_settings'] = 'Accès par digicode';
 $string['duration'] = 'Durée de session';
-$string['emulatecommunity'] = 'Emuler la version communautaire';
-$string['emulatecommunity_desc'] = 'Si elle est activée, cette option force le composant à fonctionner en version communautaire. Certaines fonctionnalités ne seront plus disponibles.';
 $string['generatecodes'] = 'Générer des codes pour les participants';
 $string['hasrestrictions'] = 'Cette session est pour un public restreint';
 $string['instructions'] = 'Instructions';
 $string['invalidsessions'] = 'Session invalide';
-$string['licenseprovider'] = 'Fournisseur version Pro';
-$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
-$string['licensekey'] = 'Clef de license pro';
-$string['licensekey_desc'] = 'entre ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['login'] = 'Se connecter';
 $string['managesessions'] = 'Gérer des sessions d\'accès';
 $string['minutes'] = '{$a} minutes';
@@ -65,7 +59,6 @@ $string['nosessions'] = 'Aucune session';
 $string['othersessioncollides'] = 'Une autre session recoupe cette plage horaire';
 $string['otherusers'] = 'Autres utilisateurs';
 $string['passwordfailure'] = 'Mot de passe incorrect.';
-$string['plugindist'] = 'Distribution du plugin';
 $string['pluginname'] = 'Accès par digicode';
 $string['preopentime'] = 'Pré-délai de présentation';
 $string['profiling'] = 'Profilage';
@@ -127,12 +120,7 @@ Mémorisez le et conservez le dans un endroit sûr et confidentiel.</p>
 $string['configgeneratepredelay_desc'] = 'Le delai d\'anticipation (en heures) avec lequel la tâche de génération et de mise à jour des digicodes sera lancée,
 par rapport au début des sessions d\'accès.';
 
-$string['plugindist_desc'] = '
-<p>Ce plugin est distribué dans la communauté Moodle pour l\'évaluation de ses fonctions centrales
-correspondant à une utilisation courante du plugin. Une version "professionnelle" de ce plugn existe et est distribuée
-sous certaines conditions, afin de soutenir l\'effort de développement, amélioration; documentation et suivi des versions.</p>
-<p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
-<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=fr_utf8">Distributeurs MyLF</a></p>';
-
 $string['configencodedigicodes_desc'] = 'Si actif, encode les digicodes en base de données. Cet encodage est plus léger,
 moins robuste, mais beaucoup plus rapide et suffisamment efficace par rapport à un hashage de mot de passe standard.';
+
+include(__DIR__.'/pro_additional_strings.php');

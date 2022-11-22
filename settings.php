@@ -17,12 +17,12 @@
 /**
  * Admin settings and defaults
  *
- * @package auth_manual
+ * @package auth_digicode
  * @copyright  2017 Stephen Bourget
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die;
+
 require_once($CFG->dirroot.'/auth/digicode/lib.php');
 
 $label = get_string('managesessions', 'auth_digicode');
@@ -120,7 +120,8 @@ if ($ADMIN->fulltree) {
     if (auth_digicode_supports_feature('emulate/community')) {
         // This will accept any.
         include_once($CFG->dirroot.'/auth/digicode/pro/prolib.php');
-        \auth_digicode\pro_manager::add_settings($ADMIN, $settings);
+        $promanager = auth_digicode\pro_manager::instance();
+        $promanager->add_settings($ADMIN, $settings);
     } else {
         $label = get_string('plugindist', 'auth_digicode');
         $desc = get_string('plugindist_desc', 'auth_digicode');

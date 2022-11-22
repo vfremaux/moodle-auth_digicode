@@ -47,16 +47,10 @@ $string['course'] = 'Target course';
 $string['digicode'] = 'Enter your code';
 $string['digicode_settings'] = 'Digicode access settings';
 $string['duration'] = 'Session duration';
-$string['emulatecommunity'] = 'Emulate community version';
-$string['emulatecommunity_desc'] = 'If enabled, the plugin will behave as the public community version. This might loose features !';
 $string['generatecodes'] = 'Generate codes for participants';
 $string['hasrestrictions'] = 'The session has restrictions on users';
 $string['instructions'] = 'Instructions';
 $string['invalidsessions'] = 'Invalid session';
-$string['licenseprovider'] = 'Pro License provider';
-$string['licenseprovider_desc'] = 'Input here your provider key';
-$string['licensekey'] = 'Pro license key';
-$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['login'] = 'Log in';
 $string['managesessions'] = 'Manage access sessions';
 $string['minutes'] = '{$a} minutes';
@@ -67,7 +61,6 @@ $string['options'] = 'Options';
 $string['othersessioncollides'] = 'Another session is colliding';
 $string['otherusers'] = 'Other users';
 $string['passwordfailure'] = 'Invalid password given';
-$string['plugindist'] = 'Plugin distribution';
 $string['pluginname'] = 'Digicode accounts';
 $string['preopentime'] = 'Presentation pre-delay';
 $string['profiling'] = 'Profiling';
@@ -125,12 +118,7 @@ Please record it in a safe place and keep it personal.</p>
 
 ';
 
-$string['plugindist_desc'] = '
-<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
-core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
-and improvement effort.</p>
-<p>Please contact one of our distributors to get "Pro" version support.</p>
-<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=en_utf8">MyLF Distributors</a></p>';
-
 $string['configencodedigicodes_desc'] = 'If enabled, encodes dificodes in data base for avoiding trivial spoofing. This
 method is slight, less robust, but very quick and sufficiant for trivial protection.';
+
+include(__DIR__.'/pro_additional_strings.php');

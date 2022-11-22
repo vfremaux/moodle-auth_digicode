@@ -15,24 +15,16 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @category auth
- * @package  auth_digicode
- * @author   Valery Fremaux (valery.fremaux@gmail.com)
- * @license  http://www.gnu.org/copyleft/gpl.html GNU Public License
- * @link     https://github.com/cannod/moodle-drupalservices
- *
+ * @package   auth_digicode
+ * @category  auth
+ * @copyright 2006 Valery Fremaux
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
 defined('MOODLE_INTERNAL') || die();
 
-$capabilities = array(
-    'auth/digicode:managesessions' => array(
-
-        'riskbitmask' => RISK_CONFIG,
-
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW,
-        )
-    ),
+$definitions = array(
+    'pro' => array(
+        'mode' => cache_store::MODE_APPLICATION
+    )
 );
