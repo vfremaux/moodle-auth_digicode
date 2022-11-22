@@ -26,11 +26,11 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2021102100;        // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires  = 2020060900;        // Requires this Moodle version.
+$plugin->requires  = 2022041200;        // Requires this Moodle version.
 $plugin->component = 'auth_digicode';     // Full name of the plugin (used for diagnostics).
 $plugin->maturity = MATURITY_RC;
-$plugin->supported = [39, 311];
-$plugin->release = "3.9.0 (Build 2021102100)";
+$plugin->supported = [40, 40];
+$plugin->release = "4.0.0 (Build 2021102100)";
 
 // Non moodle attributes.
-$plugin->codeincrement = "3.9.0002";
+$plugin->codeincrement = "4.0.0002";
