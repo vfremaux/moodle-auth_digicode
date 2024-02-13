@@ -278,7 +278,9 @@ class auth_plugin_digicode extends auth_plugin_base {
                         }
 
                         // Unify results with other methods.
-                        $fields = 'id, '.get_all_user_name_fields(true, '');
+                        // M4.
+                        $fields = \core_user\fields::for_name()->get_required_fields();
+                        $fields = implode(',', $fields);
                         foreach (array_keys($userids) as $uid) {
                             $targetusers[$uid] = $DB->get_record('user', array('id' => $uid), $fields);
                         }
@@ -297,7 +299,9 @@ class auth_plugin_digicode extends auth_plugin_base {
                         $context = context_course::instance($customdata->courseid);
                     }
 
-                    $fields = 'u.id, '.get_all_user_name_fields(true, 'u');
+                    // M4.
+                    $fields = \core_user\fields::for_name()->excluding('id')->get_required_fields();
+                    $fields = 'u.id,'.implode(',', $fields);
                     $targetusers = get_users_by_capability($context, $taskconfig->restrictionvalue, $fields);
 
                     break;
@@ -309,12 +313,17 @@ class auth_plugin_digicode extends auth_plugin_base {
                         $fieldname = str_replace('user:', '', $taskconfig->restrictionid);
                         $select = $fieldname.' LIKE ?';
                         $fields = 'id, '.get_all_user_name_fields(true, '');
+                        // M4.
+                        $fields = \core_user\fields::for_name()->get_required_fields();
+                        $fields = implode(',', $fields);
                         $targetusers = $DB->get_records_select('user', $select, array($taskconfig->restrictionvalue), $fields);
                     } else if (strpos($taskconfig->restrictionid, 'profile_field:') === 0) {
                         // By custom profile field.
                         $fieldname = str_replace('profile_field:', '', $taskconfig->restrictionid);
                         $field = $DB->get_record('user_info_field', array('shortname' => $fieldname));
-                        $fields = 'u.id, '.get_all_user_name_fields(true, 'u');
+                        // M4.
+                        $fields = \core_user\fields::for_name()->excluding('id')->get_required_fields();
+                        $fields = 'u.id,'.implode(',', $fields);
                         $sql = "
                             SELECT
                                 {$fields}

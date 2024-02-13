@@ -33,7 +33,7 @@ function auth_digicode_supports_feature($feature=null, $getsupported = false) {
 
     if (!during_initial_install()) {
         $config = get_config('auth_digicode');
-	}
+}
 
     if (!isset($supports)) {
         $supports = array(

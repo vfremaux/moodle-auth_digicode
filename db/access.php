@@ -16,8 +16,8 @@
 
 /**
  * @category auth
- * @package  auth_digicode
- * @author   Valery Fremaux (valery.fremaux@gmail.com)
+ * @package  
+ * @author   Valery Fremaux ()
  * @license  http://www.gnu.org/copyleft/gpl.html GNU Public License
  * @link     https://github.com/cannod/moodle-drupalservices
  *
